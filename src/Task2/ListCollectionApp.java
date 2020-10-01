@@ -11,20 +11,24 @@ public class ListCollectionApp {
         strCollection.add("4a");
         strCollection.add("5a");
 
-        System.out.println(" strCollection.size() = " +    strCollection.size());
-        //System.out.println(" strCollection.size() = " +    strCollection.);
-
-    ;
-        System.out.println("  strCollection.get(2)= " +    strCollection.get(2).value);
-
-        strCollection.getListCollection();
-
-        strCollection.remove(0);
         strCollection.getListCollection();
 
         strCollection.remove(1);
         strCollection.getListCollection();
         strCollection.remove(4);
+        strCollection.getListCollection();
+
+        strCollection.remove("3a");
+
+        strCollection.add("6a");
+        strCollection.add("7a");
+        strCollection.getListCollection();
+        strCollection.clear();
+
+        strCollection.add("1b");
+
+        strCollection.getListCollection();
+        strCollection.clear();
         strCollection.getListCollection();
     }
 }

@@ -1,136 +1,137 @@
 package Task2;
 
 public class ListCollection<T> {
-/*
-    private static class Element<E> {
-        E value;
-        Element next;
-        Element prev;
-        int itemIndex = 0;
 
-        Element(Element prevtElem, E valueElem, Element nextElem) {
-            this.value = valueElem;
-            this.prev = prevtElem;
-            this.next = nextElem;
-            itemIndex++;
-        }
-    }
-*/
-
-    private Element currentNode, prevNode, nextNode, firstNode, lastNode;
+    private Element currentNode, firstNode, lastNode;
     private int count;
-
+    private int maxIndex;
 
     public ListCollection() {
-        this.firstNode = null;// = new Element(null, null, null);
-        this.lastNode = null;//new Element(this.firstNode, null, null);
-
-        //  this.Node = new Element(null, null, null);
-        // this.nextNode = new Element(null, null, null);
-        this.prevNode = null;
-        this.currentNode = null;
-        this.nextNode = null;
-
-        this.count = 0;
-
+        this.firstNode = null;//первый элемент коллекции
+        this.lastNode = null;//последний элемент коллекции
+        this.currentNode = null;//текущий элемент коллекции
+        this.count = 0;//счетчик элементов
+        this.maxIndex = 0;//Сквозной индекс-идентификатор элемента
     }
 
     public void add(T item) {
 
-        if ((this.currentNode != null) && (this.currentNode.prev != null)) {
-            System.out.println("[item]      Node.prev.value = " + currentNode.value + "  " + currentNode.prev.value);
-        }
-        this.currentNode = new Element(this.currentNode, item, null, this.count);
-
+        this.currentNode = new Element(this.lastNode, item, null, this.maxIndex);
 
         if (this.currentNode.prev != null) {
-            this.currentNode.prev.next = this.currentNode;
-
-        }
-
-        //  this.Node.itemCount=count;
-
-        if (this.currentNode.prev != null) {
-            System.out.println("[item] Node.prev.next.value = " + currentNode.prev.value + "  " + currentNode.prev.next.value);
+            this.currentNode.prev.next = this.currentNode;//Предшествующему элементу указываем  текущий как next
         }
 
         if (count == 0) {
-            this.firstNode = this.currentNode;
-           // this.currentNode.prev = this.currentNode;
-            //  this. currentNode.prev.next=this.currentNode;
+            this.firstNode = this.currentNode;//Запоминаем первый элемент коллекции
         }
 
         this.count++;
-        this.lastNode = this.currentNode;
+        this.maxIndex++;
+        this.lastNode = this.currentNode;//Запоминаем последний элемент коллекции
     }
 
     public int size() {
-        return count;
+        return this.count;
+    }
+
+    public int getMaxIndex() {
+        return this.maxIndex;
     }
 
     public Element get(int indexItem) {
-        if (indexItem >= count) {
-            System.out.println(" get(" + indexItem + ") is out of bounds. (index)= " + indexItem);
+        if (indexItem >= this.maxIndex) {
+            System.out.println(" get(" + indexItem + ") is out of bounds. (index)= " + indexItem + ", maxIndex=" + this.maxIndex);
             return null;
         }
         Element retElement = this.firstNode;
         boolean checkElem = false;
         int i = 0;
 
-        while (i++ < this.count) {
-
-            //System.out.println("retElement.itemIndex = " + retElement.itemIndex);
-            if (retElement.itemIndex == indexItem) {
-                checkElem = true;
-                break;
-            } else {
-                retElement = retElement.next;
+        while (i++ < this.maxIndex) {//Перебираем слева направо все индексы до максимального
+            if (retElement != null) {
+                if (retElement.itemIndex == indexItem) {
+                    checkElem = true;
+                    break;
+                } else {
+                    retElement = retElement.next;
+                }
             }
-
         }
         if (!checkElem) {
             retElement = null;
         }
-
         return retElement;
     }
 
     public void remove(int index) {
         Element removedElement = this.get(index);
-        if (removedElement.prev!=null){
-            removedElement.prev.next = removedElement.next;
-       }else{
-            this.firstNode=removedElement.next;
-            System.out.println("remove 0");
+        if (removedElement == null) {
+            return;
+        }
+        this.deleteElement(removedElement);
+    }
+
+    public void remove(T item) {
+        Element delElement = this.firstNode;
+        boolean checkElem = false;
+        int i = 0;
+
+        while (i++ < this.maxIndex) {//Перебираем слева направо все индексы до максимального
+            if (delElement != null) {
+                if (delElement.value == item) {
+                    checkElem = true;
+                    break;
+                } else {
+                    delElement = delElement.next;
+                }
+            }
+        }
+        if (checkElem) {
+            deleteElement(delElement);
+        }
+    }
+
+    public void clear() {
+        for (int i = 0; i < this.maxIndex; i++) {
+            this.remove(i);
+        }
+        this.firstNode = null;
+        this.lastNode = null;
+        this.currentNode = null;
+        this.count = 0;
+        this.maxIndex = 0;
+    }
+
+
+    private void deleteElement(Element delElement) {
+        if (delElement == null) {
+            return;
         }
 
-        if (removedElement.next != null) {
-            removedElement.next.prev = removedElement.prev;
-        }else{
-            this.lastNode=removedElement.prev;
+        if (delElement.prev != null) {// Если элемент не первый в коллекции то предшественнику указываем на следующий за удаляемым элемент как next
+            delElement.prev.next = delElement.next;
+        } else {
+            this.firstNode = delElement.next;//Если элемент первый в коллекции , записываем в него следующий после удаляемого элемента
         }
-        // removedElement=removedElement.next;
+
+        if (delElement.next != null) {//Если элемент не последний в коллекции, то связываем следующий за удаляемым элемент с  предшественником удаляемого
+            delElement.next.prev = delElement.prev;
+        } else {
+            this.lastNode = delElement.prev;//Если удаляемый элемент последний, то записывем в него предыдущий.
+        }
         this.count--;
-
-        removedElement = null;
-        System.out.println("firstNode.value = " + this.firstNode.value);
-
-
+        delElement = null;
     }
 
     public void getListCollection() {
         Element listElement = this.firstNode;
-        int i = 0;
-
-        // while (i++ < this.count) {
+        System.out.println("Элементы коллекции:");
         while (listElement != null) {
-            System.out.println("index = ["+listElement.itemIndex+"] = " + listElement.value);
+            System.out.println("index = [" + listElement.itemIndex + "] = " + listElement.value);
             listElement = listElement.next;
-
         }
-
     }
-
 }
 
 
